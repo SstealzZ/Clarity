@@ -1,3 +1,4 @@
+@import 'react-day-picker/dist/style.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -38,5 +39,43 @@
   
   .button-secondary {
     @apply px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-colors;
+  }
+  
+  /* Styles personnalisés pour le DatePicker */
+  .custom-calendar {
+    width: 100%;
+    padding: 0.5rem;
+  }
+  
+  .custom-calendar .rdp-months {
+    margin: 0;
+  }
+  
+  .custom-calendar .rdp-month {
+    width: 100%;
+    margin: 0;
+  }
+  
+  .custom-calendar .rdp-table {
+    width: 100%;
+  }
+  
+  .custom-calendar .rdp-day {
+    margin: 0;
+    height: auto;
+    width: auto;
+  }
+  
+  .custom-calendar .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+    background-color: #232133;
+  }
+  
+  .custom-calendar .rdp-day_selected {
+    background-color: #0000FF !important;
+    color: white;
+  }
+  
+  .custom-calendar .rdp-head_cell abbr {
+    text-decoration: none;
   }
 } 
