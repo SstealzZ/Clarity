@@ -46,6 +46,8 @@ async def verify_db_connection():
 async def get_articles(
     tag: Optional[str] = Query(None, description="Filtrer par tag"),
     country: Optional[str] = Query(None, description="Filtrer par pays"),
+    today: bool = Query(False, description="Filtrer pour n'obtenir que les articles d'aujourd'hui"),
+    date: Optional[str] = Query(None, description="Filtrer par une date spécifique (format: YYYY-MM-DD)"),
     db_connected: bool = Depends(verify_db_connection)
 ):
     """
@@ -54,11 +56,13 @@ async def get_articles(
     Args:
         tag: Optional query parameter to filter articles by tag
         country: Optional query parameter to filter articles by country
+        today: When True, only returns articles published today
+        date: Optional query parameter to filter articles by specific date
         
     Returns:
         List of articles matching the filter criteria
     """
-    articles = await database.get_all_articles(tag, country)
+    articles = await database.get_all_articles(tag, country, today, date)
     return articles
 
 @app.get("/articles/{article_id}", response_model=Article, tags=["Articles"])
