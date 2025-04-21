@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Base styles for the Clarity application
+ * Defines global styles and variables
+ */
+@layer base {
+  body {
+    @apply font-sans antialiased text-white bg-background min-h-screen;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+  
+  ::selection {
+    @apply bg-primary/30;
+  }
+}
+
+/**
+ * Component styles for the Clarity application
+ */
+@layer components {
+  .glass-panel {
+    @apply bg-surface/80 backdrop-blur-sm border border-white/10 rounded-xl;
+  }
+
+  .glass-card {
+    @apply bg-surface/50 backdrop-blur-sm border border-white/10 rounded-lg transition-all duration-300 hover:border-white/20;
+  }
+  
+  .button-primary {
+    @apply px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors;
+  }
+  
+  .button-secondary {
+    @apply px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-colors;
+  }
+} 
