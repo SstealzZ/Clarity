@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 from bson import ObjectId
 import os
 import asyncio
+from datetime import datetime, timedelta
+import pytz
 
 load_dotenv()
 
@@ -14,13 +16,15 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGODB_URL)
 database = client[DATABASE_NAME]
 articles_collection = database[ARTICLES_COLLECTION]
 
-async def get_all_articles(tag=None, country=None):
+async def get_all_articles(tag=None, country=None, today=False, date=None):
     """
-    Retrieve all articles with optional filtering by tag and country.
+    Retrieve all articles with optional filtering by tag, country, and date.
     
     Args:
         tag: Optional filter for articles containing a specific tag
         country: Optional filter for articles from a specific country
+        today: When True, only returns articles published today
+        date: Optional specific date to filter articles (format: YYYY-MM-DD)
         
     Returns:
         List of article documents matching the criteria
@@ -31,9 +35,52 @@ async def get_all_articles(tag=None, country=None):
     if country:
         query["country"] = country
     
+    # Date filtering - either today or specific date
+    if date:
+        # Convert the date string to datetime objects for the start and end of the day
+        try:
+            print(f"Date reçue du client: {date}")
+            # Utiliser directement la chaîne de date pour créer des comparaisons de chaînes
+            # Cela évite les problèmes de fuseau horaire
+            date_start = f"{date}T00:00:00"
+            date_end = f"{date}T23:59:59.999999"
+            
+            # Filter articles created on the specific date
+            query["created_at"] = {
+                "$gte": date_start,
+                "$lte": date_end
+            }
+            
+            print(f"Filtrage par date exacte: {date_start} à {date_end}")
+        except ValueError as e:
+            print(f"Format de date invalide: {date}. Erreur: {e}")
+    elif today:
+        # Pour le filtrage par jour, nous utilisons une date de début (aujourd'hui à minuit)
+        # et une date de fin (aujourd'hui 23:59:59)
+        today_date = datetime.now().date()
+        today_str = today_date.isoformat()  # YYYY-MM-DD
+        
+        # Créer des chaînes ISO pour le début et la fin de la journée
+        today_start = f"{today_str}T00:00:00"
+        today_end = f"{today_str}T23:59:59.999999"
+        
+        # Filtrer les articles créés aujourd'hui
+        query["created_at"] = {
+            "$gte": today_start,
+            "$lte": today_end
+        }
+        
+        print(f"Filtrage par date aujourd'hui: {today_start} à {today_end}")
+    
     try:
         cursor = articles_collection.find(query)
         articles = await cursor.to_list(length=100)
+        
+        if today or date:
+            # Affichage des dates pour debug
+            for article in articles[:5]:  # Limité aux 5 premiers pour éviter trop de logs
+                print(f"Article date: {article.get('created_at')}")
+                
         return articles
     except Exception as e:
         print(f"Error fetching articles: {e}")
